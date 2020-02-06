@@ -81,7 +81,8 @@ public class MouseTest : MonoBehaviour
 
     IEnumerator MoveTarget()
     {
-        m_waypoints = Smooth.MakeSmoothCurve(m_waypoints, 1f);
+        yield return null;
+        //m_waypoints = Smooth.MakeSmoothCurve(m_waypoints, 1f);
         if (m_waypoints.Count > 1)
         {
             for (int i = 1; i < m_waypoints.Count; ++i)

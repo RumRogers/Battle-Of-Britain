@@ -4,39 +4,52 @@ using System.Collections.Generic;
 
 public class Smooth : MonoBehaviour
 {
-    //arrayToCurve is original Vector3 array, smoothness is the number of interpolations. 
-    public static List<Vector3> MakeSmoothCurve(List<Vector3> arrayToCurve, float smoothness)
+    [SerializeField]
+    private List<float> coordinates;
+    [SerializeField]
+    private List<float> distances;
+    private List<List<float>> array;
+    [SerializeField]
+    private float t = 0;
+    private void OnGUI()
     {
-        List<Vector3> points;
-        List<Vector3> curvedPoints;
-        int pointsLength = 0;
-        int curvedLength = 0;
-
-        if (smoothness < 1.0f) smoothness = 1.0f;
-
-        pointsLength = arrayToCurve.Count;
-
-        curvedLength = (pointsLength * Mathf.RoundToInt(smoothness)) - 1;
-        curvedPoints = new List<Vector3>(curvedLength);
-
-        float t = 0.0f;
-        for (int pointInTimeOnCurve = 0; pointInTimeOnCurve < curvedLength + 1; pointInTimeOnCurve++)
+        if (GUI.Button(new Rect(0, 0, 200, 20), "Interpolate!"))
         {
-            t = Mathf.InverseLerp(0, curvedLength, pointInTimeOnCurve);
-
-            points = new List<Vector3>(arrayToCurve);
-
-            for (int j = pointsLength - 1; j > 0; j--)
+            array = new List<List<float>>();
+            
+            for(int i = 0; i < coordinates.Count; i++)
             {
-                for (int i = 0; i < j; i++)
-                {
-                    points[i] = (1 - t) * points[i] + t * points[i + 1];
-                }
+                List<float> row = new List<float>();
+                row.Add(distances[i]);
+                row.Add(coordinates[i]);
+                
+                array.Add(row);
             }
 
-            curvedPoints.Add(points[0]);
+            int dimension = array[0].Count;
+            List<float> res = new List<float>();
+
+            for(int i = 0; i < dimension; i++)
+            {
+                CubicInterpolator interpolator = new CubicInterpolator(GetColumn(array, i).ToArray());
+                res.Add(interpolator.Interpolate(t));
+                print(res[i]);
+            }
+
+        }
+    }
+
+    private List<float> GetColumn(List<List<float>> list, int col)
+    {
+        List<float> res = new List<float>();
+
+        for(int i = 0; i < list.Count; i++)
+        {
+            res.Add(list[i][col]);
         }
 
-        return (curvedPoints);
+        return res;
     }
+
+
 }
