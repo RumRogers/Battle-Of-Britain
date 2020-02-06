@@ -4,13 +4,13 @@ using UnityEngine;
 
 public abstract class AbstractInterpolator
 {
-    public AbstractInterpolator(float[] array)
+    public AbstractInterpolator(List<float> array)
     {
         m_array = array;
-        m_length = array.Length;
+        m_length = array.Count;
     }
 
-    protected float[] m_array;
+    protected List<float> m_array;
     protected int m_length;
 
     protected int ClipClamp(int i, int n) => Mathf.Clamp(i, 0, n - 1);

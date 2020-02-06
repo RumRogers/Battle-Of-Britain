@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CubicInterpolator : AbstractInterpolator
 {
-    public CubicInterpolator(float[] array) : base(array) { }
+    public CubicInterpolator(List<float> array) : base(array) { }
 
     private float m_tangentFactor = 1;
     private float GetTangent(float k) => m_tangentFactor * (GetClippedInput((int)k + 1) - GetClippedInput((int) k - 1)) / 2;

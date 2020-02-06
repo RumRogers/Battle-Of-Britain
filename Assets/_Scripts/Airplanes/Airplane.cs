@@ -11,6 +11,22 @@ public abstract class Airplane : MonoBehaviour
     // click A to B
     // click-drag-path
 
+    public class PathDetails
+    {
+        public PathDetails(float totalDistance, Vector3 destination)
+        {
+            totalDistanceToCover = totalDistance;
+            currentDestination = destination;
+            distanceCovered = 0;
+            currentPoint = new Vector3(0f, -100f, 0f);
+        }
+
+        public float totalDistanceToCover;
+        public float distanceCovered;
+        public Vector3 currentDestination;
+        public Vector3 currentPoint;
+    }
+
     /// <summary>
     /// The models of airplane that exist within the game.
     /// </summary>
@@ -41,17 +57,22 @@ public abstract class Airplane : MonoBehaviour
     [SerializeField]
     protected float m_health;
     [SerializeField]
+    protected float m_speed;
+    [SerializeField]
     private Core.Common.Altitude m_altitude;
     private Transform m_shadow;
     private Vector3 m_shadowOffset;
     private Vector3 m_originalScale;
     private State m_state = State.CRUISING;
+    private SplineDescriptor m_path;
+    private PathDetails m_pathDetails;
+    private IEnumerator coroutine = null;
 
     protected virtual void Awake()
     {
-        foreach(Transform transform in transform)
+        foreach (Transform transform in transform)
         {
-            if(transform.CompareTag("Shadow"))
+            if (transform.CompareTag("Shadow"))
             {
                 m_shadow = transform;
                 break;
@@ -120,12 +141,12 @@ public abstract class Airplane : MonoBehaviour
         Vector3 sourceScale = transform.localScale;
         Vector3 targetScale = Core.Common.scaleMap[targetAltitude];
 
-        while(transform.position.y != destY)
+        while (transform.position.y != destY)
         {
             t += Time.deltaTime * speed;
             tmp = transform.position;
             tmp.y = Mathf.Lerp(sourceY, destY, t);
-            m_shadowOffset = Vector3.Lerp(sourceShadowOffset, targetShadowOffset, t);            
+            m_shadowOffset = Vector3.Lerp(sourceShadowOffset, targetShadowOffset, t);
             transform.position = tmp;
             transform.localScale = Vector3.Lerp(sourceScale, targetScale, t);
 
@@ -134,6 +155,48 @@ public abstract class Airplane : MonoBehaviour
 
         m_altitude = targetAltitude;
         gameObject.layer = LayerMask.NameToLayer(Core.Common.layerMasksMap[targetAltitude]);
+    }
+
+    public void SetCurrentPath(SplineDescriptor spline)
+    {
+        m_path = spline;
+        m_pathDetails = new PathDetails(spline.GetTotalDistance(), spline.GetDestinationPoint());
+    }
+
+    public void FollowPath()
+    {
+        if(coroutine == null)
+        {
+            if (m_path != null && m_pathDetails.distanceCovered < m_pathDetails.totalDistanceToCover)
+            {
+                coroutine = DoFollowPath();
+                StartCoroutine(coroutine);
+            }
+        }
+    }
+
+    private IEnumerator DoFollowPath()
+    {
+        while (m_path != null)
+        {
+            float dist = m_speed;
+            Vector3 p = m_path.GetXZFromDistance(m_pathDetails.distanceCovered + dist);
+            print("Distance: " + m_pathDetails.distanceCovered + ", Point: " + p);
+            if (m_pathDetails.currentPoint.y >= 0f)
+            {
+                transform.position = p;
+                m_pathDetails.distanceCovered += dist;
+            }
+            if (m_pathDetails.distanceCovered >= m_pathDetails.totalDistanceToCover)
+            {
+                m_path = null;
+            }
+
+            m_pathDetails.currentPoint = p;
+            yield return new WaitForSeconds(.02f);
+        }
+
+        coroutine = null;
     }
 
     private void OnGUI()
@@ -145,7 +208,7 @@ public abstract class Airplane : MonoBehaviour
         else if (GUI.Button(new Rect(210, 0, 200, 20), "DIVE LOW"))
         {
             Dive(Core.Common.Altitude.LOW);
-        }        
+        }
         else if (GUI.Button(new Rect(0, 30, 200, 20), "CLIMB MEDIUM"))
         {
             Climb(Core.Common.Altitude.MEDIUM);
@@ -154,6 +217,5 @@ public abstract class Airplane : MonoBehaviour
         {
             Climb(Core.Common.Altitude.HIGH);
         }
-
     }
 }

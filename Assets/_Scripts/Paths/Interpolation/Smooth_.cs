@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class Smooth : MonoBehaviour
+public class Smooth_ : MonoBehaviour
 {
     [SerializeField]
     private List<float> coordinates;
@@ -31,9 +31,9 @@ public class Smooth : MonoBehaviour
 
             for(int i = 0; i < dimension; i++)
             {
-                CubicInterpolator interpolator = new CubicInterpolator(GetColumn(array, i).ToArray());
+                /*CubicInterpolator interpolator = new CubicInterpolator(GetColumn(array, i).ToArray());
                 res.Add(interpolator.Interpolate(t));
-                print(res[i]);
+                print(res[i]);*/
             }
 
         }

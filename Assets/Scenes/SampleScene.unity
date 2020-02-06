@@ -384,6 +384,11 @@ PrefabInstance:
       propertyPath: m_altitude
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 7742015393611698879, guid: f41ce9a8f953abf439ff0e7d8db57c58,
+        type: 3}
+      propertyPath: m_speed
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 7742015394148071759, guid: f41ce9a8f953abf439ff0e7d8db57c58,
         type: 3}
       propertyPath: m_Layer
@@ -1157,6 +1162,7 @@ MonoBehaviour:
   target: {fileID: 1646163411}
   m_mouseDown: 0
   m_mouseDrag: 0
+  m_unfilteredCoordinates: []
   m_waypoints: []
   m_mousePos: {x: 0, y: 0, z: 0}
 --- !u!65 &1738626468

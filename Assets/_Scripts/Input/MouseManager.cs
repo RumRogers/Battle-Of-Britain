@@ -67,6 +67,8 @@ public class MouseManager : MonoBehaviour
 
     private void OnMouseDown()
     {
+        print("MouseDown");
+        return;
         for (int i = 0; i < 3; i++)
         {
             int layer;
