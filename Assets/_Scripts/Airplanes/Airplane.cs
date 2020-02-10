@@ -46,7 +46,15 @@ public abstract class Airplane : MonoBehaviour
     private Vector3 m_shadowOffset;
     private Vector3 m_originalScale;
     private State m_state = State.CRUISING;
-
+    private Vector3 m_dir;
+    [SerializeField]
+    private float m_speed;
+    [SerializeField]
+    private Vector3 m_destination;
+    private List<Vector3> m_path;
+    [SerializeField]
+    private Vector3 m_moveTo;
+    private float m_initialYRotation;
     protected virtual void Awake()
     {
         foreach(Transform transform in transform)
@@ -58,6 +66,9 @@ public abstract class Airplane : MonoBehaviour
             }
         }
 
+        m_path = new List<Vector3>();
+        m_initialYRotation = transform.localRotation.eulerAngles.y;
+        SetDestination(transform.position);
         SetAltitude(m_altitude);
     }
 
@@ -65,6 +76,15 @@ public abstract class Airplane : MonoBehaviour
     {
         //print(m_shadow.position - transform.position);
         m_shadow.position = transform.position + m_shadowOffset;
+        if(Vector3.Distance(transform.position, m_destination) > Mathf.Epsilon)
+        {
+            MoveTo(m_destination);
+        }
+        else if(m_path.Count > 0)
+        {
+            m_destination = m_path[0];
+            m_path.RemoveAt(0);
+        }
     }
 
     /// <summary>
@@ -154,6 +174,59 @@ public abstract class Airplane : MonoBehaviour
         {
             Climb(Core.Common.Altitude.HIGH);
         }
+        else if (GUI.Button(new Rect(420, 0, 200, 20), "Move to destination"))
+        {
+            //Climb(Core.Common.Altitude.HIGH);
+            SetDestination(m_moveTo);
+        }
 
+        else if (GUI.Button(new Rect(420, 30, 200, 20), "Look at destination"))
+        {
+            //Climb(Core.Common.Altitude.HIGH);
+            FaceDestination(m_moveTo);
+        }
+
+    }
+
+    protected void FaceDestination(Vector3 destination)
+    {
+        Vector3 dir = (destination - transform.position).normalized;
+        //Vector3 currRot = transform.rotation.eulerAngles;
+
+        //float cosTheta = Vector3.Dot(transform.position, dir) / (transform.position.magnitude * dir.magnitude);
+        //float angle = Mathf.Acos(Mathf.Deg2Rad * cosTheta);
+        //transform.Rotate(0f, Mathf.Rad2Deg * angle, 0f);
+        Vector3 a = new Vector3(destination.x, 0f, destination.z);
+        float angle = Vector3.Angle(Vector3.forward, a);
+        print(Vector3.Angle(Vector3.forward, a));
+        //transform.Rotate(Vector3.up, angle);
+        transform.localRotation = Quaternion.Euler(90, m_initialYRotation + angle, 0);
+    }
+
+    public void SetDestinations(List<Vector3> waypoints)
+    {
+        m_path = new List<Vector3>(waypoints);
+        m_destination = m_path[0];
+    }
+
+    protected void SetDestination(Vector3 destination)
+    {
+        Vector3 dir = (destination - transform.position).normalized;
+        m_destination = destination;
+    }
+
+    protected virtual void MoveTo(Vector3 destination)
+    {        
+        Vector3 dir = (destination - transform.position).normalized;
+        Vector3 v = dir * m_speed * Time.deltaTime;
+
+        if (Vector3.Distance(transform.position + v, destination) >= Vector3.Distance(transform.position, destination))
+        {
+            transform.position = destination;
+        }
+        else
+        {
+            transform.position += dir * m_speed * Time.deltaTime;
+        }
     }
 }
