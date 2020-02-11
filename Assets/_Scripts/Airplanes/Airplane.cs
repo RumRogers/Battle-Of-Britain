@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class Airplane : MonoBehaviour
+public class Airplane : MonoBehaviour
 {
     // sound fx (bullets)
     // controls first
@@ -39,32 +39,43 @@ public abstract class Airplane : MonoBehaviour
     [SerializeField]
     protected ModelID m_modelID;
     [SerializeField]
+    private float m_speed;
+    [SerializeField]
     protected float m_health;
     [SerializeField]
-    private Core.Common.Altitude m_altitude;
+    public Core.Common.Altitude m_altitude;
+    private Transform m_modelSprite;
     private Transform m_shadow;
     private Vector3 m_shadowOffset;
-    private Vector3 m_originalScale;
     private State m_state = State.CRUISING;
 
     protected virtual void Awake()
     {
-        foreach(Transform transform in transform)
+        foreach(Transform t in transform)
         {
-            if(transform.CompareTag("Shadow"))
+            if(t.CompareTag("ModelSprite"))
             {
-                m_shadow = transform;
+                m_modelSprite = t;
                 break;
             }
         }
 
+        foreach (Transform t in m_modelSprite)
+        {
+            if (t.CompareTag("Shadow"))
+            {
+                m_shadow = t;
+                break;
+            }
+        }
+
+        //SetDestination(transform.position);
         SetAltitude(m_altitude);
     }
 
     protected virtual void Update()
-    {
-        //print(m_shadow.position - transform.position);
-        m_shadow.position = transform.position + m_shadowOffset;
+    {         
+        m_shadow.position = m_modelSprite.position + m_shadowOffset;        
     }
 
     /// <summary>
@@ -120,12 +131,12 @@ public abstract class Airplane : MonoBehaviour
         Vector3 sourceScale = transform.localScale;
         Vector3 targetScale = Core.Common.scaleMap[targetAltitude];
 
-        while(transform.position.y != destY)
+        while (transform.position.y != destY)
         {
             t += Time.deltaTime * speed;
             tmp = transform.position;
             tmp.y = Mathf.Lerp(sourceY, destY, t);
-            m_shadowOffset = Vector3.Lerp(sourceShadowOffset, targetShadowOffset, t);            
+            m_shadowOffset = Vector3.Lerp(sourceShadowOffset, targetShadowOffset, t);
             transform.position = tmp;
             transform.localScale = Vector3.Lerp(sourceScale, targetScale, t);
 
@@ -145,7 +156,7 @@ public abstract class Airplane : MonoBehaviour
         else if (GUI.Button(new Rect(210, 0, 200, 20), "DIVE LOW"))
         {
             Dive(Core.Common.Altitude.LOW);
-        }        
+        }
         else if (GUI.Button(new Rect(0, 30, 200, 20), "CLIMB MEDIUM"))
         {
             Climb(Core.Common.Altitude.MEDIUM);
@@ -154,6 +165,20 @@ public abstract class Airplane : MonoBehaviour
         {
             Climb(Core.Common.Altitude.HIGH);
         }
+    }
 
+    public virtual void MoveTo(Vector3 destination)
+    {
+        Vector3 dir = (destination - transform.position).normalized;
+        Vector3 v = dir * m_speed * Time.deltaTime;
+
+        if (Vector3.Distance(transform.position + v, destination) >= Vector3.Distance(transform.position, destination))
+        {
+            transform.position = destination;
+        }
+        else
+        {
+            transform.position += dir * m_speed * Time.deltaTime;
+        }
     }
 }
