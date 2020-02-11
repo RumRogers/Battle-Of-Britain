@@ -7,7 +7,7 @@ using UnityEngine;
 public class MouseInteraction : MonoBehaviour
 {
     [SerializeField]
-    private float m_mouseDistanceThreshold;
+    private float m_mouseDistanceThreshold = 2f;
     [SerializeField]
     private bool m_mouseDown;
     [SerializeField]
@@ -77,9 +77,10 @@ public class MouseInteraction : MonoBehaviour
 
     void HandleMouseDown()
     {
-        if(m_focusedPilot == null)
+        CleanUp();
+
+        if (m_focusedPilot == null)
         {
-            CleanUp();
             m_focusedPilot = GetPilotByPosition(m_mousePosition);
         }
         else
@@ -96,7 +97,7 @@ public class MouseInteraction : MonoBehaviour
         
         if(m_focusedPilot != null)
         {
-            float minDistanceBetweenPoints = .06f;
+            float minDistanceBetweenPoints = 2f;
 
             if (m_waypoints.Count == 0 || (m_mousePosition - m_waypoints[m_waypoints.Count - 1]).magnitude >= minDistanceBetweenPoints)
             {               
@@ -180,9 +181,13 @@ public class MouseInteraction : MonoBehaviour
 
     void BuildPath()
     {
+        if(m_waypoints.Count == 0)
+        {
+            return;
+        }
+
         if (m_waypoints.Count == 1)
         {
-            print(m_waypoints[0]);
             InstantiateWaypointMarker(m_waypoints[0]);
         }
         else

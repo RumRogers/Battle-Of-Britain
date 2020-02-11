@@ -15,27 +15,46 @@ public class Pilot : MonoBehaviour
     protected string m_lastName = "Pilot";
     protected Airplane m_airplane;
     protected List<Vector3> m_itinerary;
-    protected bool m_mustRotate = false;
-
+    protected bool m_mustMove = false;
+    private Vector3 m_currentDestination;
     private void Awake()
     {
         m_airplane = transform.GetComponent<Airplane>();
         m_itinerary = new List<Vector3>();
+        m_mustMove = false;
+        SetCurrentDestination(transform.position);
+        //m_airplane.SetAltitude(m_airplane.m_altitude);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (MustMove())
+        if(m_mustMove)
         {
-            FollowItinerary();
+            if (Vector3.Distance(transform.position, m_currentDestination) > Mathf.Epsilon)
+            {
+                m_airplane.MoveTo(m_currentDestination);
+            }
+            else if (m_itinerary.Count > 0)
+            {
+                SetCurrentDestination(m_itinerary[0]);
+                m_itinerary.RemoveAt(0);
+            }
         }
+        
+    }
+
+    private void SetCurrentDestination(Vector3 destination)
+    {
+        m_currentDestination = destination;
+        transform.LookAt(m_currentDestination);
     }
 
     public void SetItinerary(List<Vector3> itinerary)
     {
         m_itinerary = new List<Vector3>(itinerary);
-        m_mustRotate = true;
+        SetCurrentDestination(itinerary[0]);
+        m_mustMove = true;
     }
 
     protected void FollowItinerary()
@@ -45,18 +64,12 @@ public class Pilot : MonoBehaviour
             m_itinerary.RemoveAt(0);
             if(m_itinerary.Count == 0)
             {
+                m_mustMove = false;
                 return;
             }
-            m_mustRotate = true;
         }
 
         Vector3 currentGoal = m_itinerary[0];
-        if(m_mustRotate)
-        {
-            m_mustRotate = false;
-            transform.LookAt(currentGoal);
-        }
-        
         m_airplane.MoveTo(currentGoal);
     }
 

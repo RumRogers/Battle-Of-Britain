@@ -43,15 +43,11 @@ public class Airplane : MonoBehaviour
     [SerializeField]
     protected float m_health;
     [SerializeField]
-    private Core.Common.Altitude m_altitude;
+    public Core.Common.Altitude m_altitude;
     private Transform m_modelSprite;
     private Transform m_shadow;
     private Vector3 m_shadowOffset;
     private State m_state = State.CRUISING;
-    // move this to the pilot
-    [SerializeField]
-    private Vector3 m_destination;
-    private List<Vector3> m_path;
 
     protected virtual void Awake()
     {
@@ -73,25 +69,13 @@ public class Airplane : MonoBehaviour
             }
         }
 
-        m_path = new List<Vector3>();
-
-        SetDestination(transform.position);
+        //SetDestination(transform.position);
         SetAltitude(m_altitude);
     }
 
     protected virtual void Update()
     {         
-        m_shadow.position = m_modelSprite.position + m_shadowOffset;
-
-        if (Vector3.Distance(transform.position, m_destination) > Mathf.Epsilon)
-        {
-            MoveTo(m_destination);
-        }
-        else if (m_path.Count > 0)
-        { 
-            SetDestination(m_path[0]);
-            m_path.RemoveAt(0);
-        }
+        m_shadow.position = m_modelSprite.position + m_shadowOffset;        
     }
 
     /// <summary>
@@ -181,17 +165,6 @@ public class Airplane : MonoBehaviour
         {
             Climb(Core.Common.Altitude.HIGH);
         }
-    }
-
-    public void SetDestinations(List<Vector3> waypoints)
-    {
-        m_path = new List<Vector3>(waypoints);
-    }
-
-    protected void SetDestination(Vector3 destination)
-    {         
-        m_destination = destination;
-        transform.LookAt(m_destination);
     }
 
     public virtual void MoveTo(Vector3 destination)
