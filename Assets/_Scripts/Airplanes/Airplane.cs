@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class Airplane : MonoBehaviour
+public class Airplane : MonoBehaviour
 {
     // sound fx (bullets)
     // controls first
@@ -39,50 +39,57 @@ public abstract class Airplane : MonoBehaviour
     [SerializeField]
     protected ModelID m_modelID;
     [SerializeField]
+    private float m_speed;
+    [SerializeField]
     protected float m_health;
     [SerializeField]
     private Core.Common.Altitude m_altitude;
+    private Transform m_modelSprite;
     private Transform m_shadow;
     private Vector3 m_shadowOffset;
-    private Vector3 m_originalScale;
     private State m_state = State.CRUISING;
-    private Vector3 m_dir;
-    [SerializeField]
-    private float m_speed;
+    // move this to the pilot
     [SerializeField]
     private Vector3 m_destination;
     private List<Vector3> m_path;
-    [SerializeField]
-    private Vector3 m_moveTo;
-    private float m_initialYRotation;
+
     protected virtual void Awake()
     {
-        foreach(Transform transform in transform)
+        foreach(Transform t in transform)
         {
-            if(transform.CompareTag("Shadow"))
+            if(t.CompareTag("ModelSprite"))
             {
-                m_shadow = transform;
+                m_modelSprite = t;
+                break;
+            }
+        }
+
+        foreach (Transform t in m_modelSprite)
+        {
+            if (t.CompareTag("Shadow"))
+            {
+                m_shadow = t;
                 break;
             }
         }
 
         m_path = new List<Vector3>();
-        m_initialYRotation = transform.localRotation.eulerAngles.y;
+
         SetDestination(transform.position);
         SetAltitude(m_altitude);
     }
 
     protected virtual void Update()
-    {
-        //print(m_shadow.position - transform.position);
-        m_shadow.position = transform.position + m_shadowOffset;
-        if(Vector3.Distance(transform.position, m_destination) > Mathf.Epsilon)
+    {         
+        m_shadow.position = m_modelSprite.position + m_shadowOffset;
+
+        if (Vector3.Distance(transform.position, m_destination) > Mathf.Epsilon)
         {
             MoveTo(m_destination);
         }
-        else if(m_path.Count > 0)
-        {
-            m_destination = m_path[0];
+        else if (m_path.Count > 0)
+        { 
+            SetDestination(m_path[0]);
             m_path.RemoveAt(0);
         }
     }
@@ -140,12 +147,12 @@ public abstract class Airplane : MonoBehaviour
         Vector3 sourceScale = transform.localScale;
         Vector3 targetScale = Core.Common.scaleMap[targetAltitude];
 
-        while(transform.position.y != destY)
+        while (transform.position.y != destY)
         {
             t += Time.deltaTime * speed;
             tmp = transform.position;
             tmp.y = Mathf.Lerp(sourceY, destY, t);
-            m_shadowOffset = Vector3.Lerp(sourceShadowOffset, targetShadowOffset, t);            
+            m_shadowOffset = Vector3.Lerp(sourceShadowOffset, targetShadowOffset, t);
             transform.position = tmp;
             transform.localScale = Vector3.Lerp(sourceScale, targetScale, t);
 
@@ -165,7 +172,7 @@ public abstract class Airplane : MonoBehaviour
         else if (GUI.Button(new Rect(210, 0, 200, 20), "DIVE LOW"))
         {
             Dive(Core.Common.Altitude.LOW);
-        }        
+        }
         else if (GUI.Button(new Rect(0, 30, 200, 20), "CLIMB MEDIUM"))
         {
             Climb(Core.Common.Altitude.MEDIUM);
@@ -174,49 +181,21 @@ public abstract class Airplane : MonoBehaviour
         {
             Climb(Core.Common.Altitude.HIGH);
         }
-        else if (GUI.Button(new Rect(420, 0, 200, 20), "Move to destination"))
-        {
-            //Climb(Core.Common.Altitude.HIGH);
-            SetDestination(m_moveTo);
-        }
-
-        else if (GUI.Button(new Rect(420, 30, 200, 20), "Look at destination"))
-        {
-            //Climb(Core.Common.Altitude.HIGH);
-            FaceDestination(m_moveTo);
-        }
-
-    }
-
-    protected void FaceDestination(Vector3 destination)
-    {
-        Vector3 dir = (destination - transform.position).normalized;
-        //Vector3 currRot = transform.rotation.eulerAngles;
-
-        //float cosTheta = Vector3.Dot(transform.position, dir) / (transform.position.magnitude * dir.magnitude);
-        //float angle = Mathf.Acos(Mathf.Deg2Rad * cosTheta);
-        //transform.Rotate(0f, Mathf.Rad2Deg * angle, 0f);
-        Vector3 a = new Vector3(destination.x, 0f, destination.z);
-        float angle = Vector3.Angle(Vector3.forward, a);
-        print(Vector3.Angle(Vector3.forward, a));
-        //transform.Rotate(Vector3.up, angle);
-        transform.localRotation = Quaternion.Euler(90, m_initialYRotation + angle, 0);
     }
 
     public void SetDestinations(List<Vector3> waypoints)
     {
         m_path = new List<Vector3>(waypoints);
-        m_destination = m_path[0];
     }
 
     protected void SetDestination(Vector3 destination)
-    {
-        Vector3 dir = (destination - transform.position).normalized;
+    {         
         m_destination = destination;
+        transform.LookAt(m_destination);
     }
 
-    protected virtual void MoveTo(Vector3 destination)
-    {        
+    public virtual void MoveTo(Vector3 destination)
+    {
         Vector3 dir = (destination - transform.position).normalized;
         Vector3 v = dir * m_speed * Time.deltaTime;
 

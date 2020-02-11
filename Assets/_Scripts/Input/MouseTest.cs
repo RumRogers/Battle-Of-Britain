@@ -119,19 +119,6 @@ public class MouseTest : MonoBehaviour
         waypointMarker.transform.position = pos;
         m_waypointMarkers.Add(waypointMarker);
     }
-    IEnumerator MoveTarget()
-    {
-        m_waypoints = Smooth.MakeSmoothCurve(m_waypoints, 1f);
-        if (m_waypoints.Count > 1)
-        {
-            for (int i = 1; i < m_waypoints.Count; ++i)
-            {
-                //Vector3 dir = (m_waypoints[i] - m_waypoints[i - 1]).normalized;
-                target.transform.position = m_waypoints[i];
-                yield return new WaitForSeconds(Time.deltaTime * .5f);
-            }
-        }
-    }
 
     void HandleMouseDown()
     {
