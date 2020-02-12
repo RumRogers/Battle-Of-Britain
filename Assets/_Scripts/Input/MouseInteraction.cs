@@ -23,6 +23,9 @@ public class MouseInteraction : MonoBehaviour
     private Vector3 m_lastMousePosition;
     List<Vector3> m_waypoints = new List<Vector3>();
     List<GameObject> m_waypointMarkers = new List<GameObject>();
+    [SerializeField]
+    Itinerary m_itinerary;
+
 
     private void Awake()
     {
@@ -125,7 +128,9 @@ public class MouseInteraction : MonoBehaviour
                 else
                 {
                     BuildPath();
-                    m_focusedPilot.SetItinerary(new List<Vector3>() { m_mousePosition });
+                    Itinerary it = ScriptableObject.CreateInstance<Itinerary>();
+                    it.waypoints.Add(m_mousePosition);
+                    m_focusedPilot.SetItinerary(it);
                     m_focusedPilot = null;
                 }
             }
@@ -140,7 +145,13 @@ public class MouseInteraction : MonoBehaviour
                 }
 
                 BuildPath();
-                m_focusedPilot.SetItinerary(m_waypoints);
+                Itinerary it = ScriptableObject.CreateInstance<Itinerary>();
+                it.waypoints = new List<Vector3>(m_waypoints);
+                m_focusedPilot.SetItinerary(it);
+                if(m_itinerary != null)
+                {
+                    m_itinerary.waypoints = m_waypoints;
+                }
                 m_focusedPilot = null;
             }
         }

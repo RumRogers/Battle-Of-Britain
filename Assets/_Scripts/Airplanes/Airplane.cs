@@ -44,6 +44,8 @@ public class Airplane : MonoBehaviour
     protected float m_health;
     [SerializeField]
     public Core.Common.Altitude m_altitude;
+    [SerializeField]
+    private float m_yawSpeed = 5f;
     private Transform m_modelSprite;
     private Transform m_shadow;
     private Vector3 m_shadowOffset;
@@ -69,7 +71,6 @@ public class Airplane : MonoBehaviour
             }
         }
 
-        //SetDestination(transform.position);
         SetAltitude(m_altitude);
     }
 
@@ -94,11 +95,8 @@ public class Airplane : MonoBehaviour
     public void SetAltitude(Core.Common.Altitude altitude)
     {
         m_altitude = altitude;
-        Vector3 pos = transform.position;
-        pos.y = Core.Common.altitudeMap[altitude];
-        transform.position = pos;
-        //m_shadow.localPosition = Core.Common.shadowOffsetsMap[altitude];
         m_shadowOffset = Core.Common.shadowOffsetsMap[altitude];
+        transform.localScale = Core.Common.scaleMap[altitude];
     }
 
     /// <summary>
@@ -122,22 +120,16 @@ public class Airplane : MonoBehaviour
     IEnumerator ChangeAltitude(Core.Common.Altitude targetAltitude)
     {
         float speed = .75f;
-        float sourceY = transform.position.y;
-        float destY = Core.Common.altitudeMap[targetAltitude];
         float t = 0f;
-        Vector3 tmp;
         Vector3 sourceShadowOffset = m_shadowOffset;
         Vector3 targetShadowOffset = Core.Common.shadowOffsetsMap[targetAltitude];
         Vector3 sourceScale = transform.localScale;
         Vector3 targetScale = Core.Common.scaleMap[targetAltitude];
 
-        while (transform.position.y != destY)
+        while (t < 1)
         {
             t += Time.deltaTime * speed;
-            tmp = transform.position;
-            tmp.y = Mathf.Lerp(sourceY, destY, t);
             m_shadowOffset = Vector3.Lerp(sourceShadowOffset, targetShadowOffset, t);
-            transform.position = tmp;
             transform.localScale = Vector3.Lerp(sourceScale, targetScale, t);
 
             yield return new WaitForEndOfFrame();
@@ -147,23 +139,44 @@ public class Airplane : MonoBehaviour
         gameObject.layer = LayerMask.NameToLayer(Core.Common.layerMasksMap[targetAltitude]);
     }
 
+    public IEnumerator RotateSmoothlyTo(Vector3 destination)
+    {
+        if(destination == transform.position)
+        {
+            yield break;
+        }
+
+        Quaternion sourceRotation = transform.rotation;
+        Quaternion targetRotation = Quaternion.LookRotation((destination - transform.position).normalized, Vector3.up);
+        
+        float t = 0f;
+
+        while(t < 1)
+        {
+            t += Time.deltaTime * m_yawSpeed;            
+            transform.rotation = Quaternion.Lerp(sourceRotation, targetRotation, t);
+            yield return new WaitForEndOfFrame();
+        }
+        
+    }
+
     private void OnGUI()
     {
-        if (GUI.Button(new Rect(0, 0, 200, 20), "DIVE MEDIUM"))
+        if (GUI.Button(new Rect(0, 0, 200, 20), "FLY MEDIUM"))
         {
             Dive(Core.Common.Altitude.MEDIUM);
         }
-        else if (GUI.Button(new Rect(210, 0, 200, 20), "DIVE LOW"))
+        else if (GUI.Button(new Rect(210, 0, 200, 20), "FLY LOW"))
         {
             Dive(Core.Common.Altitude.LOW);
         }
-        else if (GUI.Button(new Rect(0, 30, 200, 20), "CLIMB MEDIUM"))
-        {
-            Climb(Core.Common.Altitude.MEDIUM);
-        }
-        else if (GUI.Button(new Rect(210, 30, 200, 20), "CLIMB HIGH"))
+        else if (GUI.Button(new Rect(0, 30, 200, 20), "FLY HIGH"))
         {
             Climb(Core.Common.Altitude.HIGH);
+        }
+        else if (GUI.Button(new Rect(210, 30, 200, 20), "LAND"))
+        {
+            Climb(Core.Common.Altitude.GROUNDED);
         }
     }
 

@@ -11,14 +11,6 @@ namespace Core
             HIGH, MEDIUM, LOW, GROUNDED
         }
 
-        public static Dictionary<Altitude, float> altitudeMap = new Dictionary<Altitude, float>()
-        {
-            { Altitude.HIGH, 10f },
-            { Altitude.MEDIUM, 5f },
-            { Altitude.LOW, 2f },
-            { Altitude.GROUNDED, .1f }
-        };
-
         public static Dictionary<Altitude, Vector3> scaleMap = new Dictionary<Altitude, Vector3>()
         {
             { Altitude.GROUNDED, new Vector3(.35f, .35f, .35f)  },
@@ -36,7 +28,7 @@ namespace Core
 
         public static Dictionary<Altitude, Vector3> shadowOffsetsMap = new Dictionary<Altitude, Vector3>()
         {
-            { Altitude.GROUNDED, new Vector3(.2f, 0f, -.1f) },
+            { Altitude.GROUNDED, new Vector3(.1f, 0f, -.05f) },
             { Altitude.LOW, new Vector3(.5f, 0f, -.3f) },
             { Altitude.MEDIUM, new Vector3(1.9f, 0f, -1.8f) },
             { Altitude.HIGH, new Vector3(5.5f, 0f, -6.7f) }
