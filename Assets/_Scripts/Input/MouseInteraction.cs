@@ -129,7 +129,8 @@ public class MouseInteraction : MonoBehaviour
                 {
                     BuildPath();
                     Itinerary it = ScriptableObject.CreateInstance<Itinerary>();
-                    it.waypoints.Add(m_mousePosition);
+                    it.SetWaypoints(new List<Vector3> { m_mousePosition }, m_focusedPilot.transform.position);
+                    //it.waypoints.Add(m_mousePosition);
                     m_focusedPilot.SetItinerary(it);
                     m_focusedPilot = null;
                 }
@@ -146,11 +147,13 @@ public class MouseInteraction : MonoBehaviour
 
                 BuildPath();
                 Itinerary it = ScriptableObject.CreateInstance<Itinerary>();
-                it.waypoints = new List<Vector3>(m_waypoints);
+                it.SetWaypoints(m_waypoints, m_focusedPilot.transform.position);
+
                 m_focusedPilot.SetItinerary(it);
                 if(m_itinerary != null)
                 {
-                    m_itinerary.waypoints = m_waypoints;
+                    m_itinerary.SetWaypoints(m_waypoints, m_focusedPilot.transform.position);
+                    //m_itinerary.waypoints = m_waypoints;
                 }
                 m_focusedPilot = null;
             }

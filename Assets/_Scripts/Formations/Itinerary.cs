@@ -9,13 +9,20 @@ public class Itinerary : ScriptableObject
     public bool loop = false;
     public int idx = 0;
     public List<Vector3> waypoints = new List<Vector3>();
-    public Vector3 origin = Vector3.zero;
 
-    public void SetWaypoints(List<Vector3> waypoints, Vector3 relativeToPosition)
+    public void SetWaypoints(List<Vector3> waypoints, Vector3 origin)
     {
         foreach(Vector3 waypoint in waypoints)
         {
-            waypoints.Add(waypoint - origin);
+            this.waypoints.Add(waypoint - origin);
         }
+    }
+
+    public static Itinerary CloneItinerary(Itinerary it)
+    {
+        Itinerary clone = CreateInstance<Itinerary>();
+        clone.SetWaypoints(it.waypoints, Vector3.zero);
+
+        return clone;
     }
 }

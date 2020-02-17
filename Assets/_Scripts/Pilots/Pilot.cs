@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Pilot : MonoBehaviour
-{
+{    
     public enum Nationality
     {
         ENGLISH,
@@ -18,12 +18,17 @@ public class Pilot : MonoBehaviour
     private Vector3 m_currentDestination;
     [SerializeField]
     protected Itinerary m_itinerary;
+    private Vector3 m_itineraryOrigin;
 
     private void Awake()
     {
         m_airplane = transform.GetComponent<Airplane>();
         m_mustMove = false;
         SetCurrentDestination(transform.position);
+        if (m_itinerary != null)
+        {
+            SetItinerary(m_itinerary, m_itinerary.loop);
+        }
     }
 
     // Update is called once per frame
@@ -37,7 +42,7 @@ public class Pilot : MonoBehaviour
             }
             else if (m_itinerary != null && m_itinerary.idx < m_itinerary.waypoints.Count)
             {
-                SetCurrentDestination(m_itinerary.waypoints[m_itinerary.idx++]);
+                SetCurrentDestination(m_itineraryOrigin + m_itinerary.waypoints[m_itinerary.idx++]);
                 if (m_itinerary.idx == m_itinerary.waypoints.Count)
                 {
                     if (m_itinerary.loop)
@@ -64,8 +69,9 @@ public class Pilot : MonoBehaviour
 
     public void SetItinerary(Itinerary itinerary, bool loop = false)
     {
-        m_itinerary = itinerary;
+        m_itinerary = Itinerary.CloneItinerary(itinerary);
         m_itinerary.loop = loop;
+        m_itineraryOrigin = transform.position;
         m_mustMove = true;
     }
 

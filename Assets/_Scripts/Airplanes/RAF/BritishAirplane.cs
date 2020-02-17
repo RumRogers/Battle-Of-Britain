@@ -10,7 +10,6 @@ public abstract class BritishAirplane : Airplane
     protected float m_visibleRangeRadius;
     [SerializeField]
     protected float m_weaponsRangeRadius;
-    
 
 #if DEBUG_DRAW_RANGES
     private LineRenderer m_lineRenderer;
