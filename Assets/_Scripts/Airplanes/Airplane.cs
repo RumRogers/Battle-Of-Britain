@@ -63,22 +63,9 @@ public class Airplane : MonoBehaviour
     private Transform m_shadow;
     private Vector3 m_shadowOffset;
     private State m_state = State.CRUISING;
-    [SerializeField]
-    protected Formation m_currentFormation;
-    protected Formation CurrentFormation { get { return m_currentFormation; } }
-    [SerializeField]
-    protected int m_indexInFormation;
-    protected int IndexInFormation { get { return m_indexInFormation; } }
-    [SerializeField]
-    protected Airplane m_immediateFormationLeader;
-    [SerializeField]
-    protected int FollowersInFormation = 0;
 
     protected virtual void Awake()
     {
-        //m_currentFormation = Formation.NONE;
-        //m_indexInFormation = -1;
-
         foreach(Transform t in transform)
         {
             if(t.CompareTag("ModelSprite"))
@@ -101,38 +88,9 @@ public class Airplane : MonoBehaviour
     }
 
     protected virtual void Update()
-    {         
-        m_shadow.position = m_modelSprite.position + m_shadowOffset;
-
-        if(CurrentFormation != Formation.NONE && m_immediateFormationLeader != null)
-        {
-            Vector3 offset = FormationOffsets[CurrentFormation];
-            int multiplier = 1;
-            switch(CurrentFormation)
-            {
-                case Formation.RAF_VIC:
-                    if (IndexInFormation % 2 == 1)
-                    {
-                        multiplier = -1;
-                    }
-                    break;
-                default:
-                    break;
-            }
-
-
-            //transform.position = m_immediateFormationLeader.transform.position + m_immediateFormationLeader.transform.right * offset.magnitude * transform.localScale.x * multiplier;
-            Vector3 newDest = m_immediateFormationLeader.transform.position;
-            newDest += m_immediateFormationLeader.transform.right * offset.x * transform.localScale.x * multiplier;
-            newDest += m_immediateFormationLeader.transform.forward * offset.z * transform.localScale.x;
-
-            
-
-            /*transform.position = m_immediateFormationLeader.transform.position;
-            transform.position += m_immediateFormationLeader.transform.right * offset.x * transform.localScale.x * multiplier;
-            transform.position += m_immediateFormationLeader.transform.forward * offset.z * transform.localScale.x;
-            transform.rotation = m_immediateFormationLeader.transform.rotation;*/
-        }
+    {
+        AdjustShadow();
+        //m_shadow.position = m_modelSprite.position + m_shadowOffset;
     }
 
     /// <summary>
@@ -216,7 +174,7 @@ public class Airplane : MonoBehaviour
         
     }
 
-    private void OnGUI()
+    /*private void OnGUI()
     {
         if (GUI.Button(new Rect(0, 0, 200, 20), "FLY MEDIUM"))
         {
@@ -234,7 +192,7 @@ public class Airplane : MonoBehaviour
         {
             Climb(Core.Common.Altitude.GROUNDED);
         }
-    }
+    }*/
 
     public virtual void MoveTo(Vector3 destination)
     {
@@ -251,23 +209,8 @@ public class Airplane : MonoBehaviour
         }
     }
 
-    protected void LeadFormation(Formation formation)
+    private void AdjustShadow()
     {
-        m_currentFormation = formation;
-        m_indexInFormation = 0;
-        m_immediateFormationLeader = null;
-    }
-    protected void JoinFormation(Airplane airplane)
-    {
-        m_currentFormation = airplane.CurrentFormation;
-        m_immediateFormationLeader = airplane;
-
-        Airplane globalLeader = airplane;
-        while(globalLeader.m_immediateFormationLeader != null)
-        {
-            globalLeader = globalLeader.m_immediateFormationLeader;
-        }
-
-        globalLeader.FollowersInFormation = m_indexInFormation = globalLeader.FollowersInFormation + 1;
+        m_shadow.position = m_modelSprite.position + m_shadowOffset;
     }
 }

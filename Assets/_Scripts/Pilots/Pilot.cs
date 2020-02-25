@@ -14,16 +14,15 @@ public class Pilot : MonoBehaviour
     protected string m_firstName = "Nameless";
     protected string m_lastName = "Pilot";
     protected Airplane m_airplane;    
-    protected bool m_mustMove = false;
     private Vector3 m_currentDestination;
     [SerializeField]
     protected Itinerary m_itinerary;
     private Vector3 m_itineraryOrigin;
+    protected Formation m_currentFormation;
 
     private void Awake()
     {
         m_airplane = transform.GetComponent<Airplane>();
-        m_mustMove = false;
         SetCurrentDestination(transform.position);
         if (m_itinerary != null)
         {
@@ -42,7 +41,7 @@ public class Pilot : MonoBehaviour
             }
             else if (m_itinerary != null && m_itinerary.idx < m_itinerary.waypoints.Count)
             {
-                SetCurrentDestination(m_itineraryOrigin + m_itinerary.waypoints[m_itinerary.idx++]);
+                SetCurrentDestination(m_itineraryOrigin + m_itinerary.waypoints[m_itinerary.idx++], true);
                 if (m_itinerary.idx == m_itinerary.waypoints.Count)
                 {
                     if (m_itinerary.loop)
@@ -56,15 +55,23 @@ public class Pilot : MonoBehaviour
                 }
             }
         }
-        
+        else if (m_currentFormation != null)
+        {            
+            SetCurrentDestination(m_currentFormation.GetDestination(this), true);
+            m_airplane.MoveTo(m_currentDestination);
+        }
+
     }
 
-    private void SetCurrentDestination(Vector3 destination)
+    private void SetCurrentDestination(Vector3 destination, bool faceDestination = false)
     {
         m_currentDestination = destination;
-        StopCoroutine(m_airplane.RotateSmoothlyTo(m_currentDestination));
-        StartCoroutine(m_airplane.RotateSmoothlyTo(m_currentDestination));
-        //transform.LookAt(m_currentDestination);
+
+        if(faceDestination)
+        {
+            StopCoroutine(m_airplane.RotateSmoothlyTo(m_currentDestination));
+            StartCoroutine(m_airplane.RotateSmoothlyTo(m_currentDestination));
+        }
     }
 
     public void SetItinerary(Itinerary itinerary, bool loop = false)
@@ -72,7 +79,29 @@ public class Pilot : MonoBehaviour
         m_itinerary = Itinerary.CloneItinerary(itinerary);
         m_itinerary.loop = loop;
         m_itineraryOrigin = transform.position;
-        m_mustMove = true;
+    }
+
+    public Formation StartFormation(Formation.FormationType formationType)
+    {
+        switch(formationType)
+        {
+            case Formation.FormationType.RAF_VIC:
+                m_currentFormation = new VICFormation();
+                break;
+            default:
+                throw new System.NotImplementedException();
+        }
+
+        JoinFormation(m_currentFormation);
+
+        return m_currentFormation;
+    }
+
+
+    public void JoinFormation(Formation formation)
+    {
+        formation.AddToFormation(this);
+        m_currentFormation = formation;
     }
 
     private bool MustMove()
