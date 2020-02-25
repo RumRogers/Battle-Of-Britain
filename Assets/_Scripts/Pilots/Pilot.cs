@@ -56,8 +56,35 @@ public class Pilot : MonoBehaviour
             }
         }
         else if (m_currentFormation != null)
-        {            
-            SetCurrentDestination(m_currentFormation.GetDestination(this), true);
+        {
+            Pilot unitLeader = m_currentFormation.GetUnitLeader(this);
+
+            Vector3 dest = m_currentFormation.GetDestination(this);
+
+            float distance = Vector3.Distance(dest, transform.position);
+            bool faceDestination = distance > 2f;
+            SetCurrentDestination(dest, faceDestination);
+            
+            if(unitLeader == null)
+            {
+                return;
+            }
+
+            SetSpeed(2 * m_airplane.MaxSpeed);
+
+            if(!faceDestination)
+            {                
+                RotateTo(transform.position + unitLeader.transform.forward);
+                //SetSpeed(1000);
+                //unitLeader.SetSpeed(1000);
+                //transform.rotation = m_currentFormation.GetUnitLeader(this).transform.rotation;
+            }
+            else if(unitLeader != null && distance > 3f)
+            {
+                //unitLeader.SetSpeed(m_airplane.GetSpeed() / 2f, true);
+                //SetSpeed(1000);
+            }
+            
             m_airplane.MoveTo(m_currentDestination);
         }
 
@@ -69,9 +96,14 @@ public class Pilot : MonoBehaviour
 
         if(faceDestination)
         {
-            StopCoroutine(m_airplane.RotateSmoothlyTo(m_currentDestination));
-            StartCoroutine(m_airplane.RotateSmoothlyTo(m_currentDestination));
+            RotateTo(destination);
         }
+    }
+
+    private void RotateTo(Vector3 destination)
+    {
+        StopCoroutine(m_airplane.RotateSmoothlyTo(destination));
+        StartCoroutine(m_airplane.RotateSmoothlyTo(destination));
     }
 
     public void SetItinerary(Itinerary itinerary, bool loop = false)
@@ -107,5 +139,21 @@ public class Pilot : MonoBehaviour
     private bool MustMove()
     {
         return m_itinerary != null && (m_itinerary.loop || (m_itinerary.idx < m_itinerary.waypoints.Count));
+    }
+
+    public void SetSpeed(float targetSpeed, bool smooth = false)
+    {
+        //targetSpeed = Mathf.Clamp(targetSpeed, 0, m_airplane.MaxSpeed);
+
+        if (smooth)
+        {
+            StopCoroutine(m_airplane.ReachSpeed(targetSpeed));
+            StartCoroutine(m_airplane.ReachSpeed(targetSpeed));
+        }
+        else
+        {
+            m_airplane.SetSpeed(targetSpeed);
+        }
+
     }
 }

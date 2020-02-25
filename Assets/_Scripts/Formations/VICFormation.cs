@@ -9,7 +9,7 @@ public class VICFormation : Formation
         m_formationOffset = new Vector3(4.8f, 0f, -3.6f);
     }
 
-    protected override Pilot GetUnitLeader(Pilot p)
+    public override Pilot GetUnitLeader(Pilot p)
     {
         int idxInFormation = m_formationUnits.IndexOf(p);
 

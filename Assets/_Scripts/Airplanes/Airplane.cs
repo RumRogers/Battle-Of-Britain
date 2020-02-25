@@ -52,6 +52,7 @@ public class Airplane : MonoBehaviour
     [SerializeField]
     protected ModelID m_modelID;
     [SerializeField]
+    private float m_maxSpeed;
     private float m_speed;
     [SerializeField]
     protected float m_health;
@@ -64,8 +65,12 @@ public class Airplane : MonoBehaviour
     private Vector3 m_shadowOffset;
     private State m_state = State.CRUISING;
 
+    public float MaxSpeed { get { return m_maxSpeed; } }
+    
     protected virtual void Awake()
     {
+        m_speed = m_maxSpeed;
+
         foreach(Transform t in transform)
         {
             if(t.CompareTag("ModelSprite"))
@@ -174,6 +179,34 @@ public class Airplane : MonoBehaviour
         
     }
 
+    public IEnumerator ReachSpeed(float targetSpeed)
+    {
+        if(targetSpeed == m_speed)
+        {
+            yield break;
+        }
+
+        float sourceSpeed = m_speed;
+        float t = 0f;
+
+        while(t < 1)
+        {
+            t += Time.deltaTime * 2;
+            m_speed = Mathf.Lerp(sourceSpeed, targetSpeed, t);
+            yield return new WaitForEndOfFrame();
+        }
+
+    }
+
+    public void SetSpeed(float newSpeed)
+    {
+        m_speed = newSpeed;
+    }
+
+    public float GetSpeed()
+    {
+        return m_speed;
+    }
     /*private void OnGUI()
     {
         if (GUI.Button(new Rect(0, 0, 200, 20), "FLY MEDIUM"))
@@ -213,4 +246,5 @@ public class Airplane : MonoBehaviour
     {
         m_shadow.position = m_modelSprite.position + m_shadowOffset;
     }
+
 }

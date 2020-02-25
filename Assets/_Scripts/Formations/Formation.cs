@@ -34,7 +34,7 @@ public abstract class Formation
         return GetPositionRelativeToLeader(p, GetUnitLeader(p), GetOffsetFromUnitLeader(p));
     }
 
-    protected abstract Pilot GetUnitLeader(Pilot p);
+    public abstract Pilot GetUnitLeader(Pilot p);
     protected abstract Vector3 GetOffsetFromUnitLeader(Pilot p);
 
     protected Vector3 GetPositionRelativeToLeader(Pilot unit, Pilot leader, Vector3 offset)
@@ -51,5 +51,15 @@ public abstract class Formation
         Debug.DrawLine(leader.transform.position, pos, Color.red);
 
         return pos;   
+    }
+
+    public Pilot GetFormationLeader()
+    {
+        if(m_formationUnits.Count == 0)
+        {
+            return null;
+        }
+
+        return m_formationUnits[0];
     }
 }
