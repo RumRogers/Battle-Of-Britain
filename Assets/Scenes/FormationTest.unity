@@ -323,9 +323,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   airplanes:
-  - {fileID: 1872804723}
-  - {fileID: 725680836}
   - {fileID: 1660769821}
+  - {fileID: 725680836}
+  - {fileID: 1872804723}
   - {fileID: 2033345683}
   - {fileID: 755284253}
 --- !u!4 &467495656
@@ -662,8 +662,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_itinerary
       value: 
-      objectReference: {fileID: 11400000, guid: 44752aee10d74a24d89326f91d6acc84,
-        type: 2}
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ba56a6ef2b52cb749b0832627aa15a99, type: 3}
 --- !u!1 &944432287
