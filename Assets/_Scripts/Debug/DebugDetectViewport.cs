@@ -25,10 +25,6 @@ public class DebugDetectViewport : MonoBehaviour
     private Transform[] m_markers;
     [SerializeField]
     private Vector3 tl, tr, bl, br, c;
-    [SerializeField]
-    private LineID m_viewportBound;
-    private LineID[] m_lines = new LineID[4] { LineID.TL_TR, LineID.BL_BR, LineID.TL_BL, LineID.TR_BR };
-    // Start is called before the first frame update
 
     // Update is called once per frame
     void Update()
@@ -64,37 +60,45 @@ public class DebugDetectViewport : MonoBehaviour
             switch(FindSectorFromPoint(m_target.position))
             {
                 case SectorID.N: print("NORTH");
+                    m_intersectionMarker.position = FindIntersectionWithViewportBounds(m_target.position, LineID.TL_TR);
                     break;
                 case SectorID.S:
                     print("SOUTH");
+                    m_intersectionMarker.position = FindIntersectionWithViewportBounds(m_target.position, LineID.BL_BR);
                     break;
                 case SectorID.W:
                     print("WEST");
+                    m_intersectionMarker.position = FindIntersectionWithViewportBounds(m_target.position, LineID.TL_BL);
                     break;
                 case SectorID.E:
                     print("EAST");
+                    m_intersectionMarker.position = FindIntersectionWithViewportBounds(m_target.position, LineID.TR_BR);
                     break;
                 case SectorID.NW:
                     print("NORTH-WEST");
+                    m_intersectionMarker.position = FindClosestIntersectionToViewportCenter(m_target.position, LineID.TL_TR, LineID.TL_BL); 
                     break;
                 case SectorID.NE:
                     print("NORTH-EAST");
+                    m_intersectionMarker.position = FindClosestIntersectionToViewportCenter(m_target.position, LineID.TL_TR, LineID.TR_BR);
                     break;
                 case SectorID.SW:
                     print("SOUTH-WEST");
+                    m_intersectionMarker.position = FindClosestIntersectionToViewportCenter(m_target.position, LineID.BL_BR, LineID.TL_BL);
                     break;
                 case SectorID.SE:
                     print("SOUTH-EAST");
+                    m_intersectionMarker.position = FindClosestIntersectionToViewportCenter(m_target.position, LineID.BL_BR, LineID.TR_BR);
                     break;
             }
         }
     }
 
-    private Vector3 FindIntersectionWithViewportBounds(Vector3 endpointA, Vector3 endpointB, LineID which)
+    private Vector3 FindIntersectionWithViewportBounds(Vector3 targetPosition, LineID which)
     {
         Vector3 res = Vector3.zero;
 
-        if(endpointB.x == endpointA.x)
+        if(c.x == targetPosition.x)
         {
             res.x = c.x;
             switch(which)
@@ -110,8 +114,8 @@ public class DebugDetectViewport : MonoBehaviour
         }
 
         
-        float m = (endpointB.z - endpointA.z) / (endpointB.x - endpointA.x);
-        float b = (endpointB.x * endpointA.z - endpointA.x * endpointB.z) / (endpointB.x - endpointA.x);
+        float m = (c.z - targetPosition.z) / (c.x - targetPosition.x);
+        float b = (c.x * targetPosition.z - targetPosition.x * c.z) / (c.x - targetPosition.x);
         
         // y = mx + b
         // x = (y - b)/m
@@ -177,5 +181,13 @@ public class DebugDetectViewport : MonoBehaviour
             return SectorID.NE;
         }
         return SectorID.SE;
+    }
+
+    Vector3 FindClosestIntersectionToViewportCenter(Vector3 targetPosition, LineID line1, LineID line2)
+    {
+        Vector3 intersection1 = FindIntersectionWithViewportBounds(targetPosition, line1);
+        Vector3 intersection2 = FindIntersectionWithViewportBounds(targetPosition, line2);
+
+        return Vector3.Distance(intersection1, c) > Vector3.Distance(intersection2, c) ? intersection2 : intersection1;
     }
 }

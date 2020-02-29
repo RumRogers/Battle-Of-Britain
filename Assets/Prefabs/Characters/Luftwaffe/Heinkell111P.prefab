@@ -170,11 +170,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6521603237205235615}
-  - component: {fileID: 6521603237205235614}
   - component: {fileID: 6521603237205235609}
+  - component: {fileID: 22659445}
   m_Layer: 0
   m_Name: Heinkell111P
-  m_TagString: Player
+  m_TagString: Nazi
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -194,24 +194,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6521603237205235614
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6521603237205235612}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 66654bca42e920a4bb19eb55520f8699, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_modelID: 4
-  m_speed: 10
-  m_health: 0
-  m_altitude: 0
-  m_visibleRangeRadius: 0
-  m_weaponsRangeRadius: 0
 --- !u!114 &6521603237205235609
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -224,3 +206,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c321c219e1266154b8bed45ec41ff385, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_itinerary: {fileID: 11400000, guid: 2adc92c0d68aa214d9093c4e1c62b7cf, type: 2}
+--- !u!114 &22659445
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6521603237205235612}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5527099820794a742b8180e17ee2875b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_modelID: 0
+  m_maxSpeed: 0
+  m_health: 0
+  m_altitude: 0
+  m_yawSpeed: 5
