@@ -219,8 +219,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5527099820794a742b8180e17ee2875b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_modelID: 0
-  m_maxSpeed: 0
+  m_modelID: 4
+  m_maxSpeed: 2.5
   m_health: 0
   m_altitude: 0
   m_yawSpeed: 5

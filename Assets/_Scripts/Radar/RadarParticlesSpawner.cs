@@ -22,6 +22,8 @@ public class RadarParticlesSpawner : MonoBehaviour
     private Dictionary<Airplane, GameObject> m_enemyRadarPairs = new Dictionary<Airplane, GameObject>();
     [SerializeField]
     private GameObject m_radarParticlePrefab;
+    [SerializeField]
+    private float m_DistanceThreshold;
 
     private void Awake()
     {
@@ -192,36 +194,51 @@ public class RadarParticlesSpawner : MonoBehaviour
             {
                 Airplane airplane = pair.Key;
                 Vector3 radarPosition = Vector3.zero;
-
+                float distance = 0;
+                
                 switch (FindSectorFromPoint(airplane.transform.position))
                 {
                     case SectorID.N:
-                        radarPosition = FindIntersectionWithViewportBounds(airplane.transform.position, LineID.TL_TR);
+                        radarPosition.x = airplane.transform.position.x;
+                        radarPosition.z = m_vTL.z;
+                        distance = Mathf.Abs(m_vTL.z - airplane.transform.position.z);                        
                         break;
                     case SectorID.S:
-                        radarPosition = FindIntersectionWithViewportBounds(airplane.transform.position, LineID.BL_BR);
+                        radarPosition.x = airplane.transform.position.x;
+                        radarPosition.z = m_vBL.z;
+                        distance = Mathf.Abs(m_vBR.z - airplane.transform.position.z);
                         break;
                     case SectorID.W:
-                        radarPosition = FindIntersectionWithViewportBounds(airplane.transform.position, LineID.TL_BL);
+                        radarPosition.x = m_vTL.x;
+                        radarPosition.z = airplane.transform.position.z;
+                        distance = Mathf.Abs(m_vTL.x - airplane.transform.position.x);
                         break;
                     case SectorID.E:
-                        radarPosition = FindIntersectionWithViewportBounds(airplane.transform.position, LineID.TR_BR);
+                        radarPosition.x = m_vBR.x;
+                        radarPosition.z = airplane.transform.position.z;
+                        distance = Mathf.Abs(m_vBR.x - airplane.transform.position.x);
                         break;
                     case SectorID.NW:
-                        radarPosition = FindClosestIntersectionToViewportCenter(airplane.transform.position, LineID.TL_TR, LineID.TL_BL);
+                        radarPosition = m_vTL;
+                        distance = Mathf.Max(Mathf.Abs(m_vTL.z - airplane.transform.position.z), Mathf.Abs(m_vTL.x - airplane.transform.position.x));
                         break;
                     case SectorID.NE:
-                        radarPosition = FindClosestIntersectionToViewportCenter(airplane.transform.position, LineID.TL_TR, LineID.TR_BR);
+                        radarPosition = m_vTR;
+                        distance = Mathf.Max(Mathf.Abs(m_vTL.z - airplane.transform.position.z), Mathf.Abs(m_vBR.x - airplane.transform.position.x));
                         break;
                     case SectorID.SW:
-                        radarPosition = FindClosestIntersectionToViewportCenter(airplane.transform.position, LineID.BL_BR, LineID.TL_BL);
+                        radarPosition = m_vBL;                        
+                        distance = Mathf.Max(Mathf.Abs(m_vBR.z - airplane.transform.position.z), Mathf.Abs(m_vTL.x - airplane.transform.position.x));
                         break;
                     case SectorID.SE:
-                        radarPosition = FindClosestIntersectionToViewportCenter(airplane.transform.position, LineID.BL_BR, LineID.TR_BR);
+                        radarPosition = m_vBR;
+                        distance = Mathf.Max(Mathf.Abs(m_vBR.z - airplane.transform.position.z), Mathf.Abs(m_vBR.x - airplane.transform.position.x));
                         break;
                 }
 
-                m_enemyRadarPairs[pair.Key].transform.position = radarPosition;
+                m_enemyRadarPairs[pair.Key].transform.position = radarPosition;                
+                //print()
+                m_enemyRadarPairs[pair.Key].transform.localScale = (1 - Mathf.InverseLerp(0, m_DistanceThreshold, distance) + 0.25f) * Vector3.one;
             }
         }
     }

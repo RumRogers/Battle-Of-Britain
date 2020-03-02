@@ -4,10 +4,9 @@ using UnityEngine;
 
 public class NaziAirplane : Airplane
 {
-    protected override void Awake()
+    private void Start()
     {
         RadarParticlesSpawner.Instance.AddEnemy(this);
-        base.Awake();
     }
     protected override void Update()
     {
