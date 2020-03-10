@@ -48,7 +48,6 @@ public class Airplane : MonoBehaviour
         { Formation.RAF_VIC, new Vector3(4.8f, 0f, -3.6f) }
     };
 
-
     [SerializeField]
     protected ModelID m_modelID;
     [SerializeField]
@@ -232,7 +231,7 @@ public class Airplane : MonoBehaviour
         Vector3 dir = (destination - transform.position).normalized;
         Vector3 v = dir * m_speed * Time.deltaTime;
 
-        if (Vector3.Distance(transform.position + v, destination) >= Vector3.Distance(transform.position, destination))
+        if (Vector3.Distance(transform.position + v, destination) > Vector3.Distance(transform.position, destination))
         {
             transform.position = destination;
         }

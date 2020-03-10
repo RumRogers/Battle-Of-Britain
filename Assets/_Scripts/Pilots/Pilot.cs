@@ -10,6 +10,7 @@ public class Pilot : MonoBehaviour
         POLISH
     }
 
+    [SerializeField] bool showAngle = false;
     protected float m_discipline = 1f;
     protected string m_firstName = "Nameless";
     protected string m_lastName = "Pilot";
@@ -20,7 +21,7 @@ public class Pilot : MonoBehaviour
     private Vector3 m_itineraryOrigin;
     protected Formation m_currentFormation;
 
-    private void Awake()
+    private void Start()
     {
         m_airplane = transform.GetComponent<Airplane>();
         SetCurrentDestination(transform.position);
@@ -60,9 +61,20 @@ public class Pilot : MonoBehaviour
             Pilot unitLeader = m_currentFormation.GetUnitLeader(this);
 
             Vector3 dest = m_currentFormation.GetDestination(this);
+            
+            if(showAngle)
+            {
+                //Vector3 dir1 = (transform.position + transform.forward).normalized;
+                //Vector3 dir2 = (dest - transform.position).normalized;
+                //print(Vector3.Dot(dir1, dir2));                
+            }
 
+            Vector3 dir1 = (transform.position + transform.forward).normalized;
+            Vector3 dir2 = (dest - transform.position).normalized;
+            
             float distance = Vector3.Distance(dest, transform.position);
             bool faceDestination = distance > 2f;
+
             SetCurrentDestination(dest, faceDestination);
             
             if(unitLeader == null)
@@ -70,7 +82,7 @@ public class Pilot : MonoBehaviour
                 return;
             }
 
-            SetSpeed(2 * m_airplane.MaxSpeed);
+            //SetSpeed(2 * m_airplane.MaxSpeed);            
 
             if(!faceDestination)
             {                

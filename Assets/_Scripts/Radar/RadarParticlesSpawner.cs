@@ -237,8 +237,7 @@ public class RadarParticlesSpawner : MonoBehaviour
                 }
 
                 m_enemyRadarPairs[pair.Key].transform.position = radarPosition;                
-                //print()
-                m_enemyRadarPairs[pair.Key].transform.localScale = (1 - Mathf.InverseLerp(0, m_DistanceThreshold, distance) + 0.25f) * Vector3.one;
+                m_enemyRadarPairs[pair.Key].transform.localScale = (Mathf.InverseLerp(0, m_DistanceThreshold, distance)) * Vector3.one;
             }
         }
     }

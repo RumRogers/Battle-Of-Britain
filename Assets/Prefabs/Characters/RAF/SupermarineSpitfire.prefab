@@ -173,7 +173,7 @@ GameObject:
   - component: {fileID: 1168495378028138328}
   - component: {fileID: 1168495378028138335}
   m_Layer: 0
-  m_Name: SupermarineSpitfire 1
+  m_Name: SupermarineSpitfire
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -207,11 +207,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_modelID: 0
-  m_speed: 10
+  m_maxSpeed: 3
   m_health: 0
   m_altitude: 2
-  m_destination: {x: 0, y: 0, z: 0}
-  tryOld: 0
+  m_yawSpeed: 5
   m_visibleRangeRadius: 0
   m_weaponsRangeRadius: 0
 --- !u!114 &1168495378028138335
@@ -226,3 +225,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c321c219e1266154b8bed45ec41ff385, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  showAngle: 0
+  m_itinerary: {fileID: 0}

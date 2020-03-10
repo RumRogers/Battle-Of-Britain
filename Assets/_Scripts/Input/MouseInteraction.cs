@@ -19,23 +19,12 @@ public class MouseInteraction : MonoBehaviour
     [SerializeField]
     private GameObject m_waypointMarkerPrefab;
 
-    private List<Pilot> m_playerPilots;
+    private List<Pilot> m_playerPilots = new List<Pilot>();
     private Vector3 m_lastMousePosition;
     List<Vector3> m_waypoints = new List<Vector3>();
     List<GameObject> m_waypointMarkers = new List<GameObject>();
     [SerializeField]
     Itinerary m_itinerary;
-
-
-    private void Awake()
-    {
-        m_playerPilots = new List<Pilot>();
-        GameObject[] playerAirplanes = GameObject.FindGameObjectsWithTag("Player");
-        foreach (GameObject gameObject in playerAirplanes)
-        {
-            m_playerPilots.Add(gameObject.GetComponent<Pilot>());
-        }
-    }
 
     // Update is called once per frame
     void Update()
@@ -46,6 +35,10 @@ public class MouseInteraction : MonoBehaviour
 #endif
     }
 
+    private void Awake()
+    {
+        UpdateLists();
+    }
     void ManageInput()
     {
         m_mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -242,6 +235,19 @@ public class MouseInteraction : MonoBehaviour
             for (int i = 1; i < m_waypoints.Count; ++i)
             {
                 Debug.DrawLine(m_waypoints[i - 1], m_waypoints[i], Color.red);
+            }
+        }
+    }
+
+    public void UpdateLists()
+    {
+        GameObject[] playerAirplanes = GameObject.FindGameObjectsWithTag("Player");
+        foreach (GameObject gameObject in playerAirplanes)
+        {
+            Pilot pilot = gameObject.GetComponent<Pilot>();
+            if (!m_playerPilots.Contains(pilot))
+            {
+                m_playerPilots.Add(pilot);
             }
         }
     }
