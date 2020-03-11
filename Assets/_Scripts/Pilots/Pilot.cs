@@ -20,6 +20,8 @@ public class Pilot : MonoBehaviour
     private Vector3 m_itineraryOrigin;
     protected Formation m_currentFormation;
 
+    public Itinerary itinerary { get { return m_itinerary; } }
+
     private void Awake()
     {
         m_airplane = transform.GetComponent<Airplane>();
@@ -153,6 +155,26 @@ public class Pilot : MonoBehaviour
         else
         {
             m_airplane.SetSpeed(targetSpeed);
+        }
+
+    }
+
+    public float GetDistanceOffset()
+    {
+        if (this == m_currentFormation.GetFormationLeader())
+        {
+            return 1.0f;
+        }
+
+        else
+        {
+            float leaderDist = (m_currentFormation.GetFormationLeader().itinerary.waypoints[0] - m_currentFormation.GetFormationLeader().transform.position).magnitude;
+
+            float planeDist = (m_currentDestination - transform.position).magnitude;
+
+            //Function for calculating percentage speed reduction here
+
+            return 1.0f;
         }
 
     }

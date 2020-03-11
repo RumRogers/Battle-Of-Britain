@@ -29,9 +29,36 @@ public abstract class Formation
         m_formationUnits.Add(p);
     }
 
+    //public Vector3 GetDestination(Pilot p)
+    //{
+    //    return GetPositionRelativeToLeader(p, GetUnitLeader(p), GetOffsetFromUnitLeader(p));
+    //}
+
+    //If this is called in update I will optimise it
     public Vector3 GetDestination(Pilot p)
     {
-        return GetPositionRelativeToLeader(p, GetUnitLeader(p), GetOffsetFromUnitLeader(p));
+        int idxInFormation = m_formationUnits.IndexOf(p);
+
+        //i should equal the index of the leader's next waypoint
+        int i = 0;
+
+        if (p == GetFormationLeader())
+        {
+            //replace with a getter for next destination
+            return p.itinerary.waypoints[i];
+        }
+
+        Vector3 offset = m_formationOffset;
+
+        if (idxInFormation % 2 == 1)
+        {
+            offset.x *= -1;
+        }
+
+        //Instead of simply returning the current poition of the leader + the offset, return the (main) leader's next waypoint
+        //and add the offest to it (currently not accounting for rotations)
+
+        return GetFormationLeader().itinerary.waypoints[i] + offset;
     }
 
     public abstract Pilot GetUnitLeader(Pilot p);
