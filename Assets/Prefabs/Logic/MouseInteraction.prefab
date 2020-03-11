@@ -50,4 +50,6 @@ MonoBehaviour:
   m_focusedPilot: {fileID: 0}
   m_waypointMarkerPrefab: {fileID: 1327489575633010993, guid: 5732f4b184e93c44485bd48f74e90ad2,
     type: 3}
+  m_selectionMarkerPrefab: {fileID: 74059727931860432, guid: 76dfced84bcad5c449968a3281621c5d,
+    type: 3}
   m_itinerary: {fileID: 0}

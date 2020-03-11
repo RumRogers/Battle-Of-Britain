@@ -30,9 +30,11 @@ public class Airplane : MonoBehaviour
 
     public enum State
     {
+        IDLE,
         CRUISING,
         DIVING,
         CLIMBING
+        
         // more to come...
     }
 
@@ -62,10 +64,10 @@ public class Airplane : MonoBehaviour
     private Transform m_modelSprite;
     private Transform m_shadow;
     private Vector3 m_shadowOffset;
-    private State m_state = State.CRUISING;
 
     public float MaxSpeed { get { return m_maxSpeed; } }
-    
+    public State CurrentState { get; set; } = State.IDLE;
+
     protected virtual void Awake()
     {
         m_speed = m_maxSpeed;
@@ -94,7 +96,6 @@ public class Airplane : MonoBehaviour
     protected virtual void Update()
     {
         AdjustShadow();
-        //m_shadow.position = m_modelSprite.position + m_shadowOffset;
     }
 
     /// <summary>
@@ -233,17 +234,22 @@ public class Airplane : MonoBehaviour
 
         if (Vector3.Distance(transform.position + v, destination) > Vector3.Distance(transform.position, destination))
         {
-            transform.position = destination;
+            transform.position = destination;            
         }
         else
         {
-            transform.position += dir * m_speed * Time.deltaTime;
+            transform.position += v;
         }
     }
 
     private void AdjustShadow()
     {
         m_shadow.position = m_modelSprite.position + m_shadowOffset;
+    }
+
+    public void KeepCourse()
+    {
+        MoveTo(transform.position + transform.forward * m_speed);
     }
 
 }

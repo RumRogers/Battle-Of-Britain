@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+// last: 8
 public class Pilot : MonoBehaviour
 {    
     public enum Nationality
@@ -35,25 +35,25 @@ public class Pilot : MonoBehaviour
     void Update()
     {
         if(MustMove())
-        {
-            if (Vector3.Distance(transform.position, m_currentDestination) > Mathf.Epsilon)
+        {            
+            if (Vector3.Distance(transform.position, m_currentDestination) > 0.001f)
             {
                 m_airplane.MoveTo(m_currentDestination);
             }
-            else if (m_itinerary != null && m_itinerary.idx < m_itinerary.waypoints.Count)
+            else if (m_itinerary != null && m_itinerary.idx < m_itinerary.waypoints.Count - 1)
             {
-                SetCurrentDestination(m_itineraryOrigin + m_itinerary.waypoints[m_itinerary.idx++], true);
-                if (m_itinerary.idx == m_itinerary.waypoints.Count)
+                SetCurrentDestination(m_itineraryOrigin + m_itinerary.waypoints[++m_itinerary.idx], true);                
+            }
+            else
+            {
+                if (m_itinerary.loop)
                 {
-                    if (m_itinerary.loop)
-                    {
-                        m_itinerary.idx = 0;
-                    }
-                    else
-                    {
-                        m_itinerary = null;
-                    }
+                    m_itinerary.idx = 0;
                 }
+                else
+                {
+                    m_itinerary = null;
+                }                
             }
         }
         else if (m_currentFormation != null)
@@ -79,6 +79,10 @@ public class Pilot : MonoBehaviour
             
             if(unitLeader == null)
             {
+                if(m_airplane.CurrentState == Airplane.State.CRUISING)
+                {
+                    m_airplane.KeepCourse();
+                }
                 return;
             }
 
@@ -99,7 +103,6 @@ public class Pilot : MonoBehaviour
             
             m_airplane.MoveTo(m_currentDestination);
         }
-
     }
 
     private void SetCurrentDestination(Vector3 destination, bool faceDestination = false)
@@ -123,6 +126,9 @@ public class Pilot : MonoBehaviour
         m_itinerary = Itinerary.CloneItinerary(itinerary);
         m_itinerary.loop = loop;
         m_itineraryOrigin = transform.position;
+                
+        SetCurrentDestination(m_itineraryOrigin + m_itinerary.waypoints[m_itinerary.idx], true);
+        m_airplane.CurrentState = Airplane.State.CRUISING;
     }
 
     public Formation StartFormation(Formation.FormationType formationType)

@@ -4,6 +4,8 @@ using UnityEngine;
 
 public abstract class Formation
 {
+    public delegate void FormationSetup(GameObject formation);
+
     public enum FormationType
     {
         RAF_VIC,

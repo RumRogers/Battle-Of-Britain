@@ -18,11 +18,14 @@ public class MouseInteraction : MonoBehaviour
     private Pilot m_focusedPilot;
     [SerializeField]
     private GameObject m_waypointMarkerPrefab;
+    [SerializeField]
+    private GameObject m_selectionMarkerPrefab;
 
     private List<Pilot> m_playerPilots = new List<Pilot>();
     private Vector3 m_lastMousePosition;
     List<Vector3> m_waypoints = new List<Vector3>();
     List<GameObject> m_waypointMarkers = new List<GameObject>();
+    private GameObject m_selectionMarker;
     [SerializeField]
     Itinerary m_itinerary;
 
@@ -33,11 +36,21 @@ public class MouseInteraction : MonoBehaviour
 #if DEBUG
         PreviewPath();
 #endif
+        if(m_focusedPilot != null)
+        {
+            m_selectionMarker.transform.position = m_focusedPilot.transform.position;
+            m_selectionMarker.transform.localScale = m_focusedPilot.transform.localScale;
+        }
+        else
+        {
+            m_selectionMarker.transform.position = Vector3.one * -10000f;
+        }
     }
 
     private void Awake()
     {
         UpdateLists();
+        m_selectionMarker = Instantiate(m_selectionMarkerPrefab);
     }
     void ManageInput()
     {
@@ -75,14 +88,23 @@ public class MouseInteraction : MonoBehaviour
     {
         CleanUp();
 
-        if (m_focusedPilot == null)
+        Pilot p = GetPilotByPosition(m_mousePosition);
+
+        // first case: press on an airplane, select it if not null and different
+        // from the previously selected one
+        if (p != null)
         {
-            m_focusedPilot = GetPilotByPosition(m_mousePosition);
+            if(p != m_focusedPilot)
+            {
+                m_focusedPilot = p;
+            }
+            
         }
-        else
+        // second case: press on empty space, after an airplane has been previously selected
+        else if (m_focusedPilot != null)
         {
             // manage click for A to B flight
-        }
+        }        
 
         m_lastMousePosition = m_mousePosition;
     }
@@ -120,10 +142,10 @@ public class MouseInteraction : MonoBehaviour
                 }
                 else
                 {
-                    BuildPath();
                     Itinerary it = ScriptableObject.CreateInstance<Itinerary>();
                     it.SetWaypoints(new List<Vector3> { m_mousePosition }, m_focusedPilot.transform.position);
-                    //it.waypoints.Add(m_mousePosition);
+                    m_waypoints.Add(m_mousePosition);
+                    BuildPath();                    
                     m_focusedPilot.SetItinerary(it);
                     m_focusedPilot = null;
                 }
@@ -200,6 +222,9 @@ public class MouseInteraction : MonoBehaviour
         else
         {
             int count = m_waypoints.Count;
+            InstantiateWaypointMarker(m_waypoints[m_waypoints.Count - 1]);
+
+            return;
             Vector3 penultimateWaypoint = m_waypoints[count - 2];
             Vector3 lastWaypoint = m_waypoints[count - 1];
 
