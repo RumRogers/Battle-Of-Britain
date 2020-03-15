@@ -20,6 +20,9 @@ public class Pilot : MonoBehaviour
     private Vector3 m_itineraryOrigin;
     protected Formation m_currentFormation;
 
+    private float m_speedMult = 1f;
+
+    public Vector3 destination { get { return m_currentDestination; } }
     public Itinerary itinerary { get { return m_itinerary; } }
 
     private void Awake()
@@ -159,6 +162,7 @@ public class Pilot : MonoBehaviour
 
     }
 
+    //Returns the required speed multiplier for planes to arrive at the same time from different distances
     public float GetDistanceOffset()
     {
         if (this == m_currentFormation.GetFormationLeader())
@@ -172,9 +176,7 @@ public class Pilot : MonoBehaviour
 
             float planeDist = (m_currentDestination - transform.position).magnitude;
 
-            //Function for calculating percentage speed reduction here
-
-            return 1.0f;
+            return planeDist / leaderDist;
         }
 
     }
