@@ -23,7 +23,6 @@ public class Pilot : MonoBehaviour
     private float m_speedMult = 1f;
 
     public Vector3 destination { get { return m_currentDestination; } }
-    public Itinerary itinerary { get { return m_itinerary; } }
 
     private void Awake()
     {
@@ -172,7 +171,7 @@ public class Pilot : MonoBehaviour
 
         else
         {
-            float leaderDist = (m_currentFormation.GetFormationLeader().itinerary.waypoints[0] - m_currentFormation.GetFormationLeader().transform.position).magnitude;
+            float leaderDist = (m_currentFormation.GetFormationLeader().destination - m_currentFormation.GetFormationLeader().transform.position).magnitude;
 
             float planeDist = (m_currentDestination - transform.position).magnitude;
 

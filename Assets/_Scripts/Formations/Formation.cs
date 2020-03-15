@@ -42,9 +42,9 @@ public abstract class Formation
 
         //Instead of simply returning the current poition of the leader + the offset, return the (main) leader's next waypoint
         //and add the offest to it (currently not accounting for rotations)
-        if (GetFormationLeader().itinerary)
+        if (GetFormationLeader().destination != null)
         {
-            return GetFormationLeader().destination + GetOffsetFromUnitLeader(p);
+            return GetDestinationRelativeToLeader(p, GetUnitLeader(p), GetOffsetFromUnitLeader(p));
         }
         else
         {
@@ -69,6 +69,22 @@ public abstract class Formation
         Debug.DrawLine(leader.transform.position, pos, Color.red);
 
         return pos;   
+    }
+
+    protected Vector3 GetDestinationRelativeToLeader(Pilot unit, Pilot leader, Vector3 offset)
+    {
+        if (leader == null)
+        {
+            return unit.transform.position;
+        }
+
+        Vector3 pos = leader.destination;
+        pos += leader.transform.right * offset.x * unit.transform.localScale.x;
+        pos += leader.transform.forward * offset.z * unit.transform.localScale.x;
+
+        Debug.DrawLine(leader.transform.position, pos, Color.red);
+
+        return pos;
     }
 
     public Pilot GetFormationLeader()
